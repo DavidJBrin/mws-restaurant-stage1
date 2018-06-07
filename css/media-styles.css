@@ -94,6 +94,7 @@
   /* ====================== Restaurant Details ====================== */
   #breadcrumb {
     width: 100%;
+    text-align: left;
   }
 
   .inside #maincontent {
@@ -139,6 +140,10 @@
   .inside #footer {
     position: relative;
     width: 100%;
+  }
+
+  .filter-options select {
+    width: calc((100%/2) - 20px);
   }
 }
 
