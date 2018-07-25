@@ -6,7 +6,6 @@ const staticItems = [
   'js/dbhelper.js',
   'js/main.js',
   'js/restaurant_info.js',
-  'data/restaurants.json',
   'css/media-styles.css',
   'css/styles.css'
 ];
@@ -32,7 +31,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const reqURL = new URL(e.request.url);
   // Only respond to requests coming from the same origin
-  if (reqURL.origin === location.origin || reqURL.hostname === 'localhost') {
+  if ((reqURL.origin === location.origin || reqURL.hostname === 'localhost') && reqURL.port !== '1337') {
     e.respondWith(caches.open(appCacheName).then((cache) => {
       // We want to serve the restaurant skeleton regardless of what paramaters are passed
       if (reqURL.pathname === '/restaurant.html') {

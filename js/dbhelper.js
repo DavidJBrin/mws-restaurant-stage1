@@ -2,33 +2,80 @@
  * Common database helper functions.
  */
 class DBHelper {
+  static openDatabase() {
+    // If the browser doesn't support service worker,
+    // we don't care about having a database
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+    
+    // Create the database and makesure the object store is unique on id so we don't add duplicates.
+    this.DBPromised = idb.open('mws-restaurants', 1, function(upgradeDb) {
+      upgradeDb.createObjectStore('restaurants', {
+        keyPath: 'id'
+      });
+    });
+  }
 
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    // return `http://httpstat.us/502`;
+    return `http://localhost:${port}/restaurants/`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+    // let xhr = new XMLHttpRequest();
+    // xhr.open('GET', DBHelper.DATABASE_URL);
+    // xhr.onload = () => {
+    //   if (xhr.status === 200) { // Got a success response from server!
+    //     const json = JSON.parse(xhr.responseText);
+    //     callback(null, json);
+    //   } else { // Oops!. Got an error from server.
+    //     const error = (`Request failed. Returned status of ${xhr.status}`);
+    //     callback(error, null);
+    //   }
+    // };
+    // xhr.send();
+
+    fetch(DBHelper.DATABASE_URL)
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json().then((json) => {
+          DBHelper.DBPromised.then((db) => {
+            if (!db) return;
+
+            const tx = db.transaction('restaurants','readwrite');
+            const store = tx.objectStore('restaurants');
+            json.forEach((restaurant) => {
+              store.put(restaurant);
+            })
+          });
+
+          callback(null, json);
+        });
+      })
+      .catch(e => {
+        DBHelper.DBPromised.then(db => {
+          const store = db.transaction('restaurants').objectStore('restaurants');
+
+          store.getAll()
+            .then(restaurants => {
+              if (!restaurants) callback(e.message, null);
+              callback(null, restaurants);
+            });
+        });
+        callback(`An error occurred: ${e.message}`, null);
+      });
+
   }
 
   /**
@@ -150,7 +197,8 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    if (restaurant.photograph) return (`/img/${restaurant.photograph}.jpg`);
+    return `/img/default.jpg`;
   }
 
   /**
@@ -166,5 +214,4 @@ class DBHelper {
     );
     return marker;
   }
-
 }

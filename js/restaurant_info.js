@@ -2,6 +2,11 @@ let restaurant;
 var map;
 
 /**
+ * Open the IndexedDB database using IndexedDB
+ */
+DBHelper.openDatabase();
+
+/**
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {

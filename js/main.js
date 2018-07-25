@@ -12,7 +12,15 @@ registerServiceWorker = () => {
   }
 }
 
+/**
+ *  Register the service worker
+ **/
 registerServiceWorker();
+
+/**
+ * Open the IndexedDB database using IndexedDB
+ */
+DBHelper.openDatabase();
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
