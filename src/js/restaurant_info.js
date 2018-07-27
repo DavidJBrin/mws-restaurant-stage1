@@ -54,6 +54,9 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
+  const imageURL = DBHelper.imageUrlForRestaurant(restaurant);
+  const imageExt = DBHelper.imageExtForURL(imageURL);
+  
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
@@ -62,7 +65,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.srcset = `${imageURL}-small.${imageExt} 1x, ${imageURL}-large.${imageExt} 2x`;
   image.alt = `An image of ${restaurant.name}`;
 
   const cuisine = document.getElementById('restaurant-cuisine');

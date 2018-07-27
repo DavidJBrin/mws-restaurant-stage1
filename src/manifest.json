@@ -1,0 +1,21 @@
+{
+  "short_name": "GoodEats",
+  "name": "MWS: Restaurant Reviews App",
+  "icons": [
+    {
+      "src": "/images/icons-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/icons-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FFA500",
+  "display": "minimal-ui",
+  "scope": "/",
+  "theme_color": "#3367D6"
+}

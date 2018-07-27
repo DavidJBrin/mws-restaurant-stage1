@@ -1,6 +1,5 @@
-'use strict';
-
 (function() {
+  'use strict';
   function toArray(arr) {
     return Array.prototype.slice.call(arr);
   }
@@ -27,7 +26,7 @@
     p.request = request;
     return p;
   }
-
+  
   function promisifyCursorRequestCall(obj, method, args) {
     var p = promisifyRequestCall(obj, method, args);
     return p.then(function(value) {

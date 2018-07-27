@@ -1,12 +1,10 @@
-const appCacheName = 'mws-restaurant-v1';
+const appCacheName = 'mws-restaurant-v2';
 
 const staticItems = [
   '/',
   'restaurant.html',
-  'js/dbhelper.js',
   'js/main.js',
   'js/restaurant_info.js',
-  'css/media-styles.css',
   'css/styles.css'
 ];
 
