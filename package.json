@@ -1,0 +1,31 @@
+{
+  "name": "nws-restaurant-app",
+  "version": "1.0.0",
+  "description": "Google Nanodegree Restaurant App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/canolyb1/mws-restaurant-stage1.git"
+  },
+  "author": "Greg Pawlowski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/canolyb1/mws-restaurant-stage1/issues"
+  },
+  "homepage": "https://github.com/canolyb1/mws-restaurant-stage1#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "browser-sync": "^2.24.6",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-responsive": "^2.11.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-uglify": "^3.0.1"
+  },
+  "dependencies": {}
+}
