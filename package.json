@@ -18,14 +18,15 @@
   "homepage": "https://github.com/canolyb1/mws-restaurant-stage1#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "browser-sync": "^2.24.6",
     "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.1",
-    "gulp-concat": "^2.6.1",
     "gulp-responsive": "^2.11.0",
     "gulp-sass": "^4.0.1",
-    "gulp-uglify": "^3.0.1"
+    "webpack": "^4.16.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "idb": "^2.1.3"
+  }
 }
