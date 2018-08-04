@@ -1,10 +1,8 @@
 const gulp = require('gulp');
 const sass = require('gulp-sass');
 const browserSync = require('browser-sync').create();
-const babel = require('gulp-babel');
-const uglify = require('gulp-uglify');
-const concat = require('gulp-concat');
 const responsive = require('gulp-responsive');
+const webpack = require('webpack');
 
 
 gulp.task('build', ['move-files', 'scripts', 'styles', 'images']);
@@ -49,7 +47,8 @@ gulp.task('move-files', () => {
     .pipe(gulp.dest('dist/'));
 });
 
-// Task to minify scripts
+/* The follwing script tasks have now been replaced with webpack
+Task to minify scripts
 gulp.task('restaurant-scripts', () => {
   const scriptsToCopy = [
     'src/js/idb.js',
@@ -82,6 +81,15 @@ gulp.task('main-scripts', () => {
 });
 
 gulp.task('scripts', ['restaurant-scripts','main-scripts']);
+**/
+
+gulp.task('scripts', (callback) => {
+  webpack(require('./webpack.config.js'), (err, stats) => {
+    if (err) console.log(err.toString());
+    console.log(stats.toString());
+    callback();
+  });
+});
 
 // Transpile/Concat Sass and comppress styles
 gulp.task('styles', () => {
@@ -95,13 +103,22 @@ gulp.task('images', () => {
   gulp.src('src/img/**/*')
   .pipe(responsive({
     // produce multiple images from one source
-    '*': [
+    '!icon.png': [
       { 
         width: 800,
         rename: { suffix: '-large' }
       },{
         width: 560,
         rename: { suffix: '-small' }
+      }
+    ],
+    'icon.png': [
+      { 
+        width: 192,
+        rename: { suffix: '-192' }
+      },{
+        width: 512,
+        rename: { suffix: '-512' }
       }
     ]
   }))

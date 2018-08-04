@@ -1,7 +1,10 @@
 /**
  * Common database helper functions.
  */
-class DBHelper {
+
+import idb from  'idb';
+
+export default class DBHelper {
   static openDatabase() {
     // If the browser doesn't support service worker,
     // we don't care about having a database
