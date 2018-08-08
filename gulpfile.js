@@ -4,7 +4,6 @@ const browserSync = require('browser-sync').create();
 const responsive = require('gulp-responsive');
 const webpack = require('webpack');
 
-
 gulp.task('build', ['move-files', 'scripts', 'styles', 'images']);
 
 gulp.task('default', ['move-files', 'scripts', 'styles'], () => {
@@ -43,7 +42,7 @@ gulp.task('preview-dist', () => {
 
 // Move all static files from src to dist
 gulp.task('move-files', () => {
-  gulp.src('src/*.*')
+  gulp.src(['src/*.*', '!src/*.html'])
     .pipe(gulp.dest('dist/'));
 });
 

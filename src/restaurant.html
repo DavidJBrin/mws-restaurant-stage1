@@ -64,9 +64,9 @@
 
   <!-- Beginning scripts -->
   <!-- Main javascript file -->
-  <script type="text/javascript" src="js/restaurant_info.js"></script>
+  <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.restaurant_info.entry %>"></script>
   <!-- Google Maps -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-mxiIgXPlIzLxxJhavneToyu19cZR7WY&libraries=places&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= htmlWebpackPlugin.options.API_KEY %>&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
 
 </body>

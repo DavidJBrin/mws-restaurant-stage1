@@ -21,9 +21,11 @@
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "browser-sync": "^2.24.6",
+    "dotenv": "^6.0.0",
     "gulp": "^3.9.1",
     "gulp-responsive": "^2.11.0",
     "gulp-sass": "^4.0.1",
+    "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.16.4"
   },
   "dependencies": {

@@ -41,8 +41,8 @@
     </section>
   </main>
 
-  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-mxiIgXPlIzLxxJhavneToyu19cZR7WY&libraries=places&callback=initMap"></script>
+  <script type="application/javascript" charset="utf-8" src="<%= htmlWebpackPlugin.files.chunks.main.entry %>"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= htmlWebpackPlugin.options.API_KEY %>&libraries=places&callback=initMap"></script>
 
 
   <footer id="footer">
