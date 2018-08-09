@@ -1,7 +1,9 @@
+import './leaflet';
 import DBHelper from './dbhelper';
 
 let restaurant;
-var map;
+// var map;
+var newMap;
 
 /**
  * Open the IndexedDB database using IndexedDB
@@ -11,21 +13,50 @@ DBHelper.openDatabase();
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
+// window.initMap = () => {
+//   fetchRestaurantFromURL((error, restaurant) => {
+//     if (error) { // Got an error!
+//       console.error(error);
+//     } else {
+//       self.map = new google.maps.Map(document.getElementById('map'), {
+//         zoom: 16,
+//         center: restaurant.latlng,
+//         scrollwheel: false
+//       });
+//       fillBreadcrumb();
+//       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+//     }
+//   });
+// }
+
+/*
+ * Initialize leaflet map
+ */
+
+document.addEventListener('DOMContentLoaded', (event) => {  
+  initMap();
+});
+
+self.initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
+    } else {      
+      self.newMap = L.map('map', {
+        center: [restaurant.latlng.lat, restaurant.latlng.lng],
         zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
+        scrollWheelZoom: false
       });
+      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+        mapboxToken: MAPBOX_KEY,
+        maxZoom: 18,
+        id: 'mapbox.streets'    
+      }).addTo(self.newMap);
       fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+      DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
     }
   });
-}
+};
 
 /**
  * Get current restaurant from page URL.

@@ -11,6 +11,7 @@
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   <link rel="manifest" href="/manifest.json">
   <title>Restaurant Info</title>
@@ -65,8 +66,8 @@
   <!-- Beginning scripts -->
   <!-- Main javascript file -->
   <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.restaurant_info.entry %>"></script>
-  <!-- Google Maps -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= htmlWebpackPlugin.options.API_KEY %>&libraries=places&callback=initMap"></script>
+  <!-- Google Maps: Not being used anymore -->
+  <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= htmlWebpackPlugin.options.API_KEY %>&libraries=places&callback=initMap"></script> -->
   <!-- End scripts -->
 
 </body>
