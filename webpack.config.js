@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 const API_KEY=process.env.API_KEY;
 const mode = process.env.NODE_ENV;
@@ -28,6 +29,9 @@ const config = {
       inject: false,
       minify: (mode === 'production') ? { html5: true, collapseWhitespace: true } : false,
       API_KEY: API_KEY || 'PLEASE_ENTER_YOUR_OWN_KEY_HERE'
+    }),
+    new webpack.DefinePlugin({
+      'MAPBOX_KEY': JSON.stringify(process.env.MAPBOX_KEY) || JSON.stringify('ENTER_YOUR_MAPBOX_KEY_HERE')
     })
   ],
   mode: mode,
