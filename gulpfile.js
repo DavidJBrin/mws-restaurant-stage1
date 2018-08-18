@@ -10,6 +10,7 @@ gulp.task('default', ['move-files', 'scripts', 'styles'], () => {
   gulp.start('preview-dist');
   gulp.watch('src/js/**/*.js', ['scripts-reload']);
   gulp.watch('src/*.*', ['move-reload']);
+  gulp.watch('src/*.html', ['scripts-reload']);
   gulp.watch('src/sass/**/*', ['cssInject']);
 });
 

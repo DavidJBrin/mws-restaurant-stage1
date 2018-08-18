@@ -204,6 +204,21 @@ h2 {
   text-transform: uppercase;
 }
 
+#restaurants-list .favBtn {
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid black;
+}
+
+#restaurants-list .favBtn:hover {
+  cursor: pointer;
+  border: 1px solid red;
+}
+
+#restaurants-list .favBtn--on {
+  color: red;
+}
+
 /* ====================== Restaurant Details ====================== */
 .inside header {
   position: fixed;
@@ -279,6 +294,9 @@ h2 {
   letter-spacing: -1px;
   padding-bottom: 1pt;
 }
+#reviews-container > p {
+  margin-left: 20px;
+}
 #reviews-list {
   margin: 0;
   padding: 0;
@@ -301,4 +319,9 @@ h2 {
 }
 #restaurant-hours td {
   color: #666;
+}
+
+#add-review {
+  width: 100%;
+  padding: 20px 40px;
 }

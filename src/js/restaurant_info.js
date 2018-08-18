@@ -1,5 +1,6 @@
 import './leaflet';
 import DBHelper from './dbhelper';
+import formAction from './formAction';
 
 let restaurant;
 // var map;
@@ -35,6 +36,10 @@ DBHelper.openDatabase();
 
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
+  new formAction(document.querySelector('form'), 'http://localhost:1337/reviews/');
+  if (navigator.onLine) {
+    DBHelper.submitDeferred();
+  }
 });
 
 self.initMap = () => {
@@ -74,7 +79,7 @@ const fetchRestaurantFromURL = (callback) => {
     DBHelper.fetchRestaurantById(id, (error, restaurant) => {
       self.restaurant = restaurant;
       if (!restaurant) {
-        console.error(error);
+        console.error('Failed to fetch restaurant:', error);
         return;
       }
       fillRestaurantHTML();
@@ -109,7 +114,10 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  DBHelper.getRestaurantReviews(getParameterByName('id'), (error, reviews) => {
+    if (error) return console.log('Couldn\'t fetch reviews:', error);
+    fillReviewsHTML(reviews);
+  });
 };
 
 /**
@@ -139,7 +147,10 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
+  const addRev = document.createElement('p');
+  addRev.innerHTML = `[ <a href="#add-review">Add a New Review</a> ]`;
   container.appendChild(title);
+  container.appendChild(addRev);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -159,12 +170,16 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 const createReviewHTML = (review) => {
   const li = document.createElement('li');
+  if (review.deferredAt) {
+    li.classList.add('review--deferred')
+  }
   const name = document.createElement('p');
   name.innerHTML = review.name;
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  review.createdAt = new Date(review.createdAt || review.deferredAt);
+  date.innerHTML = review.createdAt;
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -192,7 +207,7 @@ const fillBreadcrumb = (restaurant=self.restaurant) => {
 /**
  * Get a parameter by name from page URL.
  */
-const getParameterByName = (name, url) => {
+self.getParameterByName = (name, url) => {
   if (!url)
     url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
@@ -204,3 +219,5 @@ const getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
+
+export { createReviewHTML };

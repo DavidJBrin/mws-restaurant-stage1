@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
+  if (navigator.onLine) {
+    DBHelper.submitDeferred();
+  }
 });
 
 /**
@@ -197,6 +200,26 @@ const createRestaurantHTML = (restaurant) => {
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
   li.append(name);
+
+  const favorite = document.createElement('button');
+  favorite.innerHTML = '❤';
+  favorite.classList.add('favBtn');
+  // The server is updating the property to a string for some reason. Need to convert it back to boolean.
+  if (restaurant.is_favorite === 'false') {
+    restaurant.is_favorite = false;
+  } else if (restaurant.is_favorite === 'true') {
+    restaurant.is_favorite = true;
+  }
+  
+  if (restaurant.is_favorite) {
+    favorite.classList.add('favBtn--on')
+  }
+  favorite.addEventListener('click', (e) => {
+    const favNow = !restaurant.is_favorite;
+    DBHelper.updateFavorite(restaurant.id, favNow);
+    e.target.classList.toggle('favBtn--on');
+  })
+  li.append(favorite);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;

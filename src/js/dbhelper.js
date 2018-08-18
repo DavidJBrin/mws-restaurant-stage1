@@ -3,6 +3,7 @@
  */
 
 import idb from  'idb';
+import { RSA_X931_PADDING } from 'constants';
 
 export default class DBHelper {
   static openDatabase() {
@@ -13,10 +14,20 @@ export default class DBHelper {
     }
     
     // Create the database and makesure the object store is unique on id so we don't add duplicates.
-    this.DBPromised = idb.open('mws-restaurants', 1, function(upgradeDb) {
-      upgradeDb.createObjectStore('restaurants', {
-        keyPath: 'id'
-      });
+    this.DBPromised = idb.open('mws-restaurants', 2, function(upgradeDb) {
+      switch(upgradeDb.oldVersion) {
+        case 0:
+          upgradeDb.createObjectStore('restaurants', {
+            keyPath: 'id'
+          });
+        case 1:
+          // Create store and index for reviews.
+          const reviewStore = upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+          reviewStore.createIndex('restaurantID', ['restaurant_id', 'createdAt']);
+          // Create store for deffered reviews.
+          const deferredStore = upgradeDb.createObjectStore('deferredReviews', { keyPath: 'deferredAt' });
+          deferredStore.createIndex('restaurantID', ['restaurant_id', 'deferredAt']);
+        }
     });
   }
 
@@ -27,7 +38,7 @@ export default class DBHelper {
   static get DATABASE_URL() {
     const port = 1337 // Change this to your server port
     // return `http://httpstat.us/502`;
-    return `http://localhost:${port}/restaurants/`;
+    return `http://localhost:${port}`;
   }
 
   /**
@@ -47,7 +58,7 @@ export default class DBHelper {
     // };
     // xhr.send();
 
-    fetch(DBHelper.DATABASE_URL)
+    fetch(`${DBHelper.DATABASE_URL}/restaurants`)
       .then(response => {
         if (!response.ok) {
           throw Error(response.statusText);
@@ -60,7 +71,7 @@ export default class DBHelper {
             const store = tx.objectStore('restaurants');
             json.forEach((restaurant) => {
               store.put(restaurant);
-            })
+            });
           });
 
           callback(null, json);
@@ -72,13 +83,51 @@ export default class DBHelper {
 
           store.getAll()
             .then(restaurants => {
-              if (!restaurants) callback(e.message, null);
+              if (!restaurants) callback(`Couldn't find restaurants in IDB: ${e.message}`, null);
               callback(null, restaurants);
             });
         });
-        callback(`An error occurred: ${e.message}`, null);
       });
+  }
 
+  static getRestaurantReviews(id, callback) {
+    return fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${id}`)
+      .then(res => {
+        if (!res.ok) {
+          throw Error(res.statusText);
+        }
+        return res.json();
+      })
+      .then(json => {
+        DBHelper.DBPromised.then((db) => {
+          if (!db) return;
+
+          const tx = db.transaction('reviews','readwrite');
+          const store = tx.objectStore('reviews');
+          json.forEach((review) => {
+            store.put(review);
+          });
+        });
+        callback(null, json);
+      })
+      .catch(e => {
+        // Error fetching, try geting reviews from IDB.
+        DBHelper.DBPromised.then(db => {
+          const tx = db.transaction(['reviews', 'deferredReviews'])
+          const revStore = tx.objectStore('reviews').index('restaurantID');
+          const deferredStore = tx.objectStore('deferredReviews').index('restaurantID');
+          id = parseInt(id);
+          // Create range to include only id, the index is a compound index on id + create date
+          const range = IDBKeyRange.bound([id], [id+1], true, false);
+          Promise.all([revStore.getAll(range), deferredStore.getAll(range)])
+            .then(reviews => {
+              reviews = [...reviews[0], ...reviews[1]];
+              if (!reviews) return callback(`An error occured: ${e.message}`, null);
+              if (reviews.length === 0) return callback(null, null);
+              callback(null, reviews);
+            });
+        });
+      });
   }
 
   /**
@@ -99,6 +148,7 @@ export default class DBHelper {
       }
     });
   }
+
 
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
@@ -171,6 +221,23 @@ export default class DBHelper {
     });
   }
 
+  static updateFavorite(id, fav) {
+    fetch(`${DBHelper.DATABASE_URL}/restaurants/${id}/?is_favorite=${fav}`, {
+      method: 'PUT'
+    })
+    .then(() => {
+      DBHelper.DBPromised
+        .then((db) => {
+          const store = db.transaction('restaurants', 'readwrite').objectStore('restaurants');
+            store.get(id)
+              .then((restaurant) => {
+                restaurant.is_favorite = fav;
+                store.put(restaurant);
+              });
+        });
+    });
+  }
+
   /**
    * Fetch all cuisines with proper error handling.
    */
@@ -201,7 +268,7 @@ export default class DBHelper {
    */
   static imageUrlForRestaurant(restaurant) {
     if (restaurant.photograph) return (`/img/${restaurant.photograph}`);
-    return `/img/default`;
+    return `/img/${restaurant.id}`;
   }
 
   static imageExtForURL(URL) {
@@ -231,5 +298,64 @@ export default class DBHelper {
       })
       marker.addTo(self.newMap);
     return marker;
+  }
+
+  static submitDeferred() {
+    DBHelper.DBPromised.then( db => {
+      const store =  db.transaction('deferredReviews').objectStore('deferredReviews');
+      const submittedRes = {};
+      store.getAll()
+      .then( revs => {
+        if (revs.length === 0) return;
+        return Promise.all(revs.map( rev => {
+          return fetch(`${DBHelper.DATABASE_URL}/reviews`, {
+            method: 'POST',
+            body: JSON.stringify({
+              restaurant_id: rev.restaurant_id,
+              name: rev.name,
+              createdAt: rev.deferredAt,
+              rating: rev.rating,
+              comments: rev.comments
+            })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw Error(response.statusText);
+            }
+            return response.json();
+          })
+          .then(json => {
+            if (rev.restaurant_name in submittedRes) {
+              submittedRes[rev.restaurant_name] = submittedRes[rev.restaurant_name] + 1;
+            } else {
+              submittedRes[rev.restaurant_name] = 1;
+            }
+            return json;
+          });
+        }));
+      })
+      .then((serverRevs) => {
+          if (!serverRevs) return;
+          if (Object.keys(submittedRes).length === 0) return;
+          DBHelper.showDeferredSubmitModal(submittedRes);
+          const store =  db.transaction('deferredReviews', 'readwrite').objectStore('deferredReviews');
+          store.clear();
+        });
+    });
+  }
+
+  static showDeferredSubmitModal(reviews) {
+    const modal = document.createElement('div');
+    modal.classList.add('deferredModal');
+    let restaurantHTML = '';
+    for (const restaurant in reviews) {
+      restaurantHTML += `<p>Submitted ${reviews[restaurant]} review(s) for ${restaurant}</p>`
+    }
+    restaurantHTML += `<p>Please refresh the app to see your live reviews</p>`;
+    modal.innerHTML = restaurantHTML;
+    document.body.insertBefore(modal, document.body.firstChild);
+    window.setTimeout(() => {
+      document.body.removeChild(modal);
+    }, 3000);
   }
 }

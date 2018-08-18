@@ -1,10 +1,16 @@
 # Mobile Web Specialist Certification Course
 
 ---
-## About the Structure
+## About the structure
 The concatenated and minimized app is in the /dist directory. Please serve the application from the /dist directory.
 
 > NOTE: If you want to test any of the build scripts, please make sure to install all dev dependencies by running `npm install`.
+
+## How to deploy / test
+1. Install all dependencies with `npm install`
+2. Edit the .env file and add your own leaflet key and make sure the the mode is set to 'production'
+3. run `gulp build` 
+4. The dist folder will be build and ready to serve
 
 ## Scripts
 The following scripts are able to be used:

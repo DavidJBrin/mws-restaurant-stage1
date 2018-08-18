@@ -1,0 +1,16 @@
+input {
+  width: 100%;
+}
+
+.review--hidden {
+  opacity: 0;
+}
+
+textarea {
+  width: 100%;
+}
+
+.fadeIn {
+  opacity: 1;
+  transition: all .8s;
+}

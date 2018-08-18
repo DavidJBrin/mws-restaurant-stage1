@@ -145,6 +145,11 @@
   .filter-options select {
     width: calc((100%/2) - 20px);
   }
+
+  #add-review {
+    width: 100%;
+    order: 4;
+  }
 }
 
 @media screen and (min-width: 1100px) {

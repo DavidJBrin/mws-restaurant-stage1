@@ -1,0 +1,13 @@
+.review {
+  &--deferred {
+    background-color: rgba($color: white, $alpha: .4) !important;
+
+    &:before {
+      content: '! This review has not been posted yet';
+      color: orange;
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}

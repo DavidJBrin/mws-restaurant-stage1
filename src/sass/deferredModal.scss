@@ -1,0 +1,18 @@
+.deferredModal {
+  background-color: rgba(#f18200, .8);
+  width: 50%;
+  border-radius: 20px;
+  position: fixed;
+  z-index: 9999;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 15px;
+  left: 50%;
+  top: 90px;
+  transform: translate(-50%,-50%);
+
+  & p {
+    color: white;
+  }
+
+}
